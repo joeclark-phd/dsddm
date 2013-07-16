@@ -35,8 +35,8 @@ q = 100  # number of new individuals that "arrive" each time period
 #   for each turn
 #       concept drift
 #       generate individuals
-#       pass individuals to DSDDM model
-#       make decisions and calculate consequences
+#       pass individuals to DSDDM model and make decisions according to model
+#       update model with the results (but not with results from non-chosen individuals)
 #       save turn data
 #   save simulation data
 # save/output experiment data
