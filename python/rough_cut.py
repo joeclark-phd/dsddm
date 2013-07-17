@@ -14,7 +14,7 @@ n = 2  # classes of individuals
 p = (0.5,0.5)  # population proportions corresponding to classes of individuals
 m = 5  # number of X variables for building classification models
 q = 100  # number of new individuals that "arrive" each time period
-
+z = 0.02  # probability of abrupt concept drift in any given time period
 
 # DEPENDENCIES
 from rough_cut_environment import *
@@ -29,7 +29,7 @@ for s in range(sims):
 #   INITIALIZATION
 
     score = 0
-    environment = BasicEnvironment(n,p,m,q)
+    environment = BasicEnvironment(n,p,m,q,z)
     training_data = environment.generate_individuals(q)
     decisionmodel = BasicDSDDM(n,p,m,q,training_data)
 

@@ -60,7 +60,7 @@ class crudeNaiveBayes:
 # and not when it is imported by another script
 if __name__ == "__main__":
     from rough_cut_environment import *
-    be = BasicEnvironment(2,(0.5,0.5),5,10)
+    be = BasicEnvironment(2,(0.5,0.5),5,10,0.02)
     data = be.generate_individuals(10)
     for d in data: print(d)
     nb = crudeNaiveBayes(2,5,data)

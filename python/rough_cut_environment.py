@@ -30,6 +30,7 @@ def weighted_choice(weights):
 class CClass:
     # one of the n classes/type of customers or agents in the environment
     def __init__(self,C,R,m):
+        self._m = m # the number of X variables
         self._C = C  # the class knows its number/name
         self._R = R  # reward "distribution" -- in this case a reward fixed at initialization
         self._M = [ random.betavariate(2,2) for i in range(m) ]  # x variable distributions -- in this case randomly generated probabilities of a 1 or 0 value (aka Bernoulli distribution)
@@ -40,7 +41,10 @@ class CClass:
         return( Individual(self._C,self._R,xvars) )
     def concept_drift(self):
         # implement the effects of concept drift on this class
-        pass
+        # (only if the BasicEnvironment concept_drift method has determined that this should occur)
+        for i in range(self._m):
+            # each Bernoulli probability is redrawn from the initial Beta distribution with 50% probability
+            if random.random() < 0.5: self._M[i] = random.betavariate(2,2)
 
 
         
@@ -59,10 +63,11 @@ class Individual:
         
 class BasicEnvironment:
     # the simple environment model described in the 2013 AMCIS paper
-    def __init__(self,n,p,m,q):
+    def __init__(self,n,p,m,q,z):
         self._n = n
         self._p = p
         self._m = m
+        self._z = z
         # initialize _C as a list of n CClass objects (in this case, two classes, one "good" one "bad")
         self._C = [ CClass("1",1,m), CClass("2",-1,m) ]
         # check for errors
@@ -82,7 +87,8 @@ class BasicEnvironment:
         # implement the effects of concept drift on the environment
         # (calling the concept_drift() method of CClasses as needed)
         # print("concept drifting...")
-        pass
+        if random.random() < self._z:
+            for c in self._C: c.concept_drift()
         
         
         
@@ -91,6 +97,9 @@ class BasicEnvironment:
 # the following is test code; it will only run if this module is launched directly 
 # and not when it is imported by another script
 if __name__ == "__main__":
-    be = BasicEnvironment(2,(0.5,0.5),3)
-    data = be.generate_individuals(10)
-    print(data)
+    be = BasicEnvironment(2,(0.5,0.5),5,10,0.02)
+    #data = be.generate_individuals(10)
+    #print(data)
+    for C in be._C: print(C._M)
+    be.concept_drift()
+

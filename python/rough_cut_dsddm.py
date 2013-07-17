@@ -44,7 +44,7 @@ class BasicDSDDM:
 # and not when it is imported by another script
 if __name__ == "__main__":
     import rough_cut_environment
-    be = rough_cut_environment.BasicEnvironment(2,(0.5,0.5),5,10)
+    be = rough_cut_environment.BasicEnvironment(2,(0.5,0.5),5,10,0.02)
     bd = BasicDSDDM(2,(0.5,0.5),5,10,be.generate_individuals(10))
     newdata = be.generate_individuals(10)
     print(bd.decide(newdata))
