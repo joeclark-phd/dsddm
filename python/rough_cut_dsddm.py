@@ -10,25 +10,32 @@
 
 
 import random
+from rough_cut_naivebayes import *
         
 class BasicDSDDM:
     # a very simple DSDDM model
     def __init__(self,n,p,m,q,training_data):
+        self._n = n
+        self._m = m
         # here we could initialize some strategy variable if needed
-        self._database = []
-        self._database.append(training_data)  # the elements of _database are lists of Individuals corresponding to distinct time periods; element zero is the pre-simulation training data. thus the indexes are out of line with the simulation ticks... the data from time period "t" is stored in _database[t+1]
+        #self._database = []
+        #self._database.append(training_data)  # the elements of _database are lists of Individuals corresponding to distinct time periods; element zero is the pre-simulation training data. thus the indexes are out of line with the simulation ticks... the data from time period "t" is stored in _database[t+1]
         # now, build the initial model...
+        self._model = crudeNaiveBayes( self._n, self._m, training_data )
     def update_model(self,newdata):
         # newdata is the set of Individuals who were "chosen" this round, with the outcomes that resulted.
         # now, add them to "history" and update our models
-        self._database.append(newdata)
+        #self._database.append(newdata)
         # update the model...
+        self._model = crudeNaiveBayes( self._n, self._m, newdata )
     def decide(self,new_individuals):
         # given the individuals who arrive, and using the existing model, "choose" some of them and
         # return only the ones that are chosen, i.e., classified as "good"
-        # for now, we'll just pick half of them randomly
-        return( random.sample( new_individuals, int(len(new_individuals)/2) ) )
-        
+        # in this case we use our crude naive bayes classifier
+        chosen_set = []
+        for i in new_individuals:
+            if self._model.classify(i) == 1:  chosen_set.append(i)  # class #1 is the "good" class
+        return(chosen_set)
         
         
         
@@ -37,7 +44,7 @@ class BasicDSDDM:
 # and not when it is imported by another script
 if __name__ == "__main__":
     import rough_cut_environment
-    bd = BasicDSDDM()
-    be = rough_cut_environment.BasicEnvironment(2,(0.5,0.5),3)
-    bd.update_model( be.generate_individuals(10) )
-    print(bd.decide())
+    be = rough_cut_environment.BasicEnvironment(2,(0.5,0.5),5,10)
+    bd = BasicDSDDM(2,(0.5,0.5),5,10,be.generate_individuals(10))
+    newdata = be.generate_individuals(10)
+    print(bd.decide(newdata))
