@@ -6,8 +6,8 @@
 
 
 # TECHNICAL PARAMETERS
-sims = 5
-turns = 10
+sims = 1000
+turns = 200
 
 # SIMULATION MODEL PARAMETERS
 n = 2  # classes of individuals
@@ -19,13 +19,17 @@ z = 0.02  # probability of abrupt concept drift in any given time period
 # DEPENDENCIES
 from rough_cut_environment import *
 from rough_cut_dsddm import *
+import time
 
+# EXPERIMENT DATA STRUCTURES
+sim_turn_score = [[0 for t in range(turns)] for s in range(sims)]  # the score per turn, per simulation
 
+experiment_start_time = time.clock() # for timing the program
 print("beginning experiment")
 # SIMULATION LOOP
 # for each simulation
 for s in range(sims):
-
+    simulation_start_time = time.clock()
 #   INITIALIZATION
 
     score = 0
@@ -35,6 +39,7 @@ for s in range(sims):
 
 #   for each turn
     for t in range(turns):
+        turnscore = 0
 #       concept drift
         environment.concept_drift()
 #       generate individuals
@@ -43,14 +48,23 @@ for s in range(sims):
         decisionmodel.update_model( chosen )
 #       accumulate positive and negative rewards into the running score
         for indiv in chosen:
-            score += indiv.R
+            turnscore += indiv.R
 #       save turn data
+        sim_turn_score[s][t] = turnscore
+        score += turnscore
 #       end of turn
 
 #   save simulation data
-    print("total score from simulation #",s,":",score)
 #   end of simulation
+    print("simulation",s+1,"of",sims,"completed in",round(time.clock()-simulation_start_time,2),"seconds")
 
 # save/output experiment data
+print("saving data...")
+import csv
+with open("rough_cut_output.csv","w",newline="") as csvfile:
+    outfile = csv.writer(csvfile)
+    outfile.writerows(sim_turn_score)
+
 # end of experiment
-print("experiment completed")
+print("experiment completed in",round(time.clock()-experiment_start_time,2),"seconds")
+
